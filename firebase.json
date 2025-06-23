@@ -1,0 +1,32 @@
+{
+  "hosting": {
+    "site": "islamicbooks2",
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/sqlite_book_reader.html"
+      }
+    ],
+    "headers": [
+      {
+        "source": "**/*.@(zip|sqlite|db)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=86400"
+          },
+          {
+            "key": "Access-Control-Allow-Origin",
+            "value": "*"
+          }
+        ]
+      }
+    ]
+  }
+}
