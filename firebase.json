@@ -10,7 +10,7 @@
     "rewrites": [
       {
         "source": "**",
-        "destination": "/sqlite_book_reader.html"
+        "destination": "/home.html"
       }
     ],
     "headers": [
