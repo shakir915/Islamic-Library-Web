@@ -216,14 +216,44 @@ class CacheManager {
 
 let cacheManager;
 
-// Download and extract zip file
+// Download and extract zip file with progress
 async function downloadAndExtractZip(url) {
     const response = await fetch(url);
     if (!response.ok) {
         throw new Error(`خطأ في التحميل: ${response.status} - ${url}`);
     }
     
-    const arrayBuffer = await response.arrayBuffer();
+    const contentLength = response.headers.get('content-length');
+    const total = parseInt(contentLength, 10);
+    let loaded = 0;
+
+    const reader = response.body.getReader();
+    const chunks = [];
+
+    while (true) {
+        const { done, value } = await reader.read();
+        
+        if (done) break;
+        
+        chunks.push(value);
+        loaded += value.length;
+        
+        if (total) {
+            const progress = Math.round((loaded / total) * 100);
+            updateProgress(progress);
+        }
+    }
+
+    const arrayBuffer = new Uint8Array(loaded);
+    let position = 0;
+    for (let chunk of chunks) {
+        arrayBuffer.set(chunk, position);
+        position += chunk.length;
+    }
+
+    updateProgress(100);
+    updateLoadingText('جاري استخراج الملفات...');
+    
     const zip = await JSZip.loadAsync(arrayBuffer);
     
     // Find the SQLite file (should be book_id-major_online-minor_online.sqlite)
@@ -245,9 +275,18 @@ async function downloadAndExtractZip(url) {
     return sqliteData;
 }
 
+// Update progress percentage
+function updateProgress(percentage) {
+    const progressText = document.getElementById('progress-text');
+    if (progressText) {
+        progressText.textContent = percentage + '%';
+    }
+}
+
 // Load book
 async function loadBook() {
     updateLoadingText(`جاري تحميل الكتاب: ${bookInfo.book_name}`);
+    updateProgress(0);
     
     console.log('Book info received:', bookInfo); // Debug log
     
@@ -268,6 +307,7 @@ async function loadBook() {
     
     if (cached) {
         console.log('Book found in cache'); // Debug log
+        updateProgress(100);
         bookData = cached.data;
     } else {
         // Download book using the new URL format
@@ -293,6 +333,9 @@ async function loadBook() {
 
 // Load book pages
 async function loadBookPages() {
+    updateLoadingText('جاري تحميل صفحات الكتاب...');
+    updateProgress('');
+    
     const stmt = currentBookDb.prepare("SELECT COUNT(*) as count FROM page ORDER BY id");
     stmt.step();
     totalPages = stmt.getAsObject().count;
@@ -304,7 +347,7 @@ async function loadBookPages() {
     document.getElementById('goto-input').max = totalPages;
     
     updatePageDisplay();
-    updateProgress();
+    updateProgressBar();
     loadCurrentPage();
 }
 
@@ -328,7 +371,7 @@ function loadCurrentPage() {
     
     stmt.free();
     updateNavigationButtons();
-    updateProgress();
+    updateProgressBar();
 }
 
 // Navigation functions
@@ -385,7 +428,7 @@ function updatePageDisplay() {
     document.getElementById('total-pages-info').textContent = totalPages;
 }
 
-function updateProgress() {
+function updateProgressBar() {
     const progress = (currentPage / totalPages) * 100;
     const progressFill = document.getElementById('progress-fill');
     progressFill.style.width = progress + '%';

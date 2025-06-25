@@ -69,6 +69,17 @@ body {
     height: 50px;
     animation: spin 1s linear infinite;
     margin: 20px auto;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.progress-text {
+    position: absolute;
+    font-size: 0.7rem;
+    font-weight: bold;
+    color: var(--text-light);
 }
 
 @keyframes spin {
