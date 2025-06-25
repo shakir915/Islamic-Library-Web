@@ -1,96 +1,6 @@
-:root {
-    /* Light theme colors */
-    --bg-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --bg-secondary: rgba(255,255,255,0.1);
-    --card-bg: white;
-    --text-primary: #333;
-    --text-secondary: #666;
-    --text-light: white;
-    --shadow: rgba(0,0,0,0.1);
-    --shadow-hover: rgba(0,0,0,0.2);
-    --border-color: #e9ecef;
-    --accent: #667eea;
-    --success: #4CAF50;
-    --error: #ff4757;
-    --navigation-bg: #f8f9fa;
-    --input-bg: white;
-}
+/* Add these CSS rules to your read_styles.css file */
 
-[data-theme="dark"] {
-    /* Dark theme colors */
-    --bg-primary: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-    --bg-secondary: rgba(255,255,255,0.05);
-    --card-bg: #2c3e50;
-    --text-primary: #ecf0f1;
-    --text-secondary: #bdc3c7;
-    --text-light: #ecf0f1;
-    --shadow: rgba(0,0,0,0.3);
-    --shadow-hover: rgba(0,0,0,0.4);
-    --border-color: #34495e;
-    --accent: #3498db;
-    --success: #27ae60;
-    --error: #e74c3c;
-    --navigation-bg: #34495e;
-    --input-bg: #34495e;
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: var(--bg-primary);
-    min-height: 100vh;
-    direction: rtl;
-    transition: all 0.3s ease;
-    
-    /* Fix overscroll to match theme */
-    overscroll-behavior: contain;
-    background-attachment: fixed;
-}
-
-.container {
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
-.loading {
-    text-align: center;
-    color: var(--text-light);
-    font-size: 1.2rem;
-    margin: 50px 0;
-}
-
-.spinner {
-    border: 4px solid rgba(255,255,255,0.3);
-    border-radius: 50%;
-    border-top: 4px solid var(--text-light);
-    width: 50px;
-    height: 50px;
-    animation: spin 1s linear infinite;
-    margin: 20px auto;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.progress-text {
-    position: absolute;
-    font-size: 0.7rem;
-    font-weight: bold;
-    color: var(--text-light);
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
+/* Make the reader container use flexbox for dynamic height */
 .reader-container {
     background: var(--card-bg);
     border-radius: 15px;
@@ -98,8 +8,12 @@ body {
     overflow: hidden;
     margin-bottom: 20px;
     transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 40px); /* Full viewport height minus container padding */
 }
 
+/* Keep header fixed size */
 .reader-header {
     background: var(--bg-primary);
     color: var(--text-light);
@@ -110,70 +24,10 @@ body {
     flex-wrap: wrap;
     gap: 15px;
     position: relative;
+    flex-shrink: 0; /* Don't shrink */
 }
 
-.theme-toggle {
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    background: var(--bg-secondary);
-    border: none;
-    color: var(--text-light);
-    padding: 8px 12px;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
-}
-
-.theme-toggle:hover {
-    background: rgba(255,255,255,0.2);
-    transform: scale(1.05);
-}
-
-.reader-title {
-    font-size: 1.3rem;
-    font-weight: 600;
-    flex: 1;
-    min-width: 200px;
-}
-
-.header-controls {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-.back-btn, .home-btn, .theme-toggle2 {
-    background: var(--bg-secondary);
-    border: none;
-    color: var(--text-light);
-    padding: 10px 20px;
-    border-radius: 25px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    white-space: nowrap;
-    backdrop-filter: blur(10px);
-}
-
-.back-btn:hover, .home-btn:hover, .theme-toggle2:hover {
-    background: rgba(255,255,255,0.3);
-    transform: scale(1.05);
-}
-
-.page-content {
-    padding: 30px;
-    font-size: 1.1rem;
-    line-height: 1.8;
-    color: var(--text-primary);
-    min-height: 400px;
-    text-align: justify;
-    white-space: pre-wrap;
-    transition: all 0.3s ease;
-}
-
+/* Keep navigation fixed size */
 .navigation {
     display: flex;
     justify-content: space-between;
@@ -183,264 +37,40 @@ body {
     flex-wrap: wrap;
     gap: 15px;
     transition: all 0.3s ease;
+    flex-shrink: 0; /* Don't shrink */
 }
 
-.navigation-top {
-    border-bottom: 1px solid var(--border-color);
-}
-
-.navigation-bottom {
-    border-top: 1px solid var(--border-color);
-}
-
-.nav-btn {
-    background: var(--bg-primary);
-    border: none;
-    color: var(--text-light);
-    padding: 12px 24px;
-    border-radius: 25px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    min-width: 120px;
-}
-
-.nav-btn:hover:not(:disabled) {
-    transform: scale(1.05);
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-}
-
-.nav-btn:disabled {
-    background: var(--text-secondary);
-    cursor: not-allowed;
-    transform: none;
-}
-
-.page-info {
-    background: var(--card-bg);
-    padding: 10px 20px;
-    border-radius: 20px;
-    box-shadow: 0 2px 10px var(--shadow);
-    font-weight: 600;
+/* Make page content flexible and adaptive */
+.page-content {
+    padding: 30px;
+    font-size: 1.1rem;
+    line-height: 1.8;
     color: var(--text-primary);
-    min-width: 100px;
-    text-align: center;
+    text-align: justify;
+    white-space: pre-wrap;
     transition: all 0.3s ease;
+    flex: 1; /* Take up remaining space */
+    min-height: 400px; /* Minimum height for short content */
+    overflow-y: auto; /* Allow scrolling if content is too long */
 }
-
-.page-controls {
-    background: var(--bg-secondary);
-    border-radius: 15px;
-    padding: 20px;
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    flex-wrap: wrap;
-    backdrop-filter: blur(10px);
-}
-
-.goto-page {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: var(--text-light);
-}
-
-.goto-input {
-    width: 80px;
-    padding: 8px;
-    border: none;
-    border-radius: 5px;
-    text-align: center;
-    font-size: 1rem;
-    background: var(--input-bg);
-    color: var(--text-primary);
-    transition: all 0.3s ease;
-}
-
-.goto-input:focus {
-    outline: 2px solid var(--accent);
-}
-
-.goto-btn {
-    background: var(--bg-secondary);
-    border: none;
-    color: var(--text-light);
-    padding: 8px 16px;
-    border-radius: 15px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
-}
-
-.goto-btn:hover {
-    background: rgba(255,255,255,0.3);
-}
-
-.error {
-    background: var(--error);
-    color: white;
-    padding: 15px;
-    border-radius: 10px;
-    margin: 20px 0;
-    text-align: center;
-}
-
-.hidden {
-    display: none;
-}
-
-.book-info {
-    background: var(--bg-secondary);
-    border-radius: 15px;
-    padding: 20px;
-    margin-bottom: 20px;
-    color: var(--text-light);
-    text-align: center;
-    backdrop-filter: blur(10px);
-}
-
-/* Enhanced Seekable Progress Bar */
-.progress-container {
-    margin: 15px 0;
-    position: relative;
-}
-
-.progress-bar {
-    background: rgba(255,255,255,0.2);
-    border-radius: 15px;
-    height: 12px;
-    cursor: pointer;
-    position: relative;
-    overflow: visible;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-.progress-bar:hover {
-    height: 16px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-}
-
-.progress-fill {
-    background: linear-gradient(90deg, var(--text-light), rgba(255,255,255,0.8));
-    height: 100%;
-    border-radius: 15px;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: visible;
-}
-
-.progress-thumb {
-    position: absolute;
-    right: -8px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 20px;
-    height: 20px;
-    background: var(--text-light);
-    border-radius: 50%;
-    cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-    transition: all 0.3s ease;
-    opacity: 0;
-}
-
-.progress-bar:hover .progress-thumb {
-    opacity: 1;
-}
-
-.progress-thumb:hover {
-    transform: translateY(-50%) scale(1.2);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-}
-
-.progress-tooltip {
-    position: absolute;
-    bottom: 35px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0,0,0,0.8);
-    color: white;
-    padding: 5px 10px;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    white-space: nowrap;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-    z-index: 10;
-}
-
-.progress-tooltip::after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    border: 5px solid transparent;
-    border-top-color: rgba(0,0,0,0.8);
-}
-
-.progress-container:hover .progress-tooltip {
-    opacity: 1;
-}
-
-@media (max-width: 768px) {
-    .reader-header {
-        flex-direction: column;
-        text-align: center;
-        padding-top: 60px; /* Make room for theme toggle */
-    }
-    
-    .theme-toggle {
-        top: 10px;
-        left: 10px;
-    }
-    
-    .navigation {
-        flex-direction: column;
-        gap: 15px;
-    }
-    
-    .page-controls {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .page-content {
-        padding: 20px;
-        font-size: 1rem;
-    }
-
-    .progress-bar {
-        height: 16px;
-    }
-
-    .progress-bar:hover {
-        height: 20px;
-    }
-
-    .progress-thumb {
-        width: 24px;
-        height: 24px;
-        right: -12px;
-    }
-}
-
 
 /* Style for elements with data-type="title" */
 [data-type="title"] {
     font-weight: bold;
-  
-  
+    display: block;
+    margin-top: 1.5em;
+    margin-bottom: 1.5em;
 }
 
-/* Alternative: If you want to target span specifically */
-/* span[data-type="title"] {
-    font-weight: bold;
-    display: block;
-    margin-top: 0.25em;
-    margin-bottom: 0.25em;
-} */
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+    .reader-container {
+        min-height: calc(100vh - 40px);
+    }
+    
+    .page-content {
+        padding: 20px;
+        font-size: 1rem;
+        min-height: 300px; /* Smaller minimum on mobile */
+    }
+}

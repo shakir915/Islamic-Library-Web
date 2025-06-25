@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,13 +11,13 @@
         :root {
             /* Light theme colors */
             --bg-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --bg-secondary: rgba(255,255,255,0.1);
+            --bg-secondary: rgba(255, 255, 255, 0.1);
             --card-bg: white;
             --text-primary: #333;
             --text-secondary: #666;
             --text-light: white;
-            --shadow: rgba(0,0,0,0.15);
-            --shadow-hover: rgba(0,0,0,0.2);
+            --shadow: rgba(0, 0, 0, 0.15);
+            --shadow-hover: rgba(0, 0, 0, 0.2);
             --border-color: #e9ecef;
             --accent: #667eea;
             --success: #4CAF50;
@@ -27,13 +28,13 @@
         [data-theme="dark"] {
             /* Dark theme colors */
             --bg-primary: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-            --bg-secondary: rgba(255,255,255,0.05);
+            --bg-secondary: rgba(255, 255, 255, 0.05);
             --card-bg: #2c3e50;
             --text-primary: #ecf0f1;
             --text-secondary: #bdc3c7;
             --text-light: #ecf0f1;
-            --shadow: rgba(0,0,0,0.3);
-            --shadow-hover: rgba(0,0,0,0.4);
+            --shadow: rgba(0, 0, 0, 0.3);
+            --shadow-hover: rgba(0, 0, 0, 0.4);
             --border-color: #34495e;
             --accent: #3498db;
             --success: #27ae60;
@@ -71,7 +72,7 @@
         .header h1 {
             font-size: 2.5rem;
             margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .header-buttons {
@@ -82,7 +83,8 @@
             gap: 10px;
         }
 
-        .theme-toggle, .storage-button {
+        .theme-toggle,
+        .storage-button {
             background: var(--bg-secondary);
             border: none;
             color: var(--text-light);
@@ -94,8 +96,9 @@
             backdrop-filter: blur(10px);
         }
 
-        .theme-toggle:hover, .storage-button:hover {
-            background: rgba(255,255,255,0.2);
+        .theme-toggle:hover,
+        .storage-button:hover {
+            background: rgba(255, 255, 255, 0.2);
             transform: scale(1.05);
         }
 
@@ -111,7 +114,7 @@
         }
 
         .spinner {
-            border: 4px solid rgba(255,255,255,0.3);
+            border: 4px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
             border-top: 4px solid var(--text-light);
             width: 50px;
@@ -132,8 +135,13 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         .books-grid {
@@ -246,7 +254,7 @@
             .books-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .header-buttons {
                 position: static;
                 justify-content: center;
@@ -255,6 +263,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="header">
@@ -301,7 +310,7 @@
         function toggleTheme() {
             const currentTheme = document.documentElement.getAttribute('data-theme');
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            
+
             document.documentElement.setAttribute('data-theme', newTheme);
             localStorage.setItem('theme', newTheme);
             updateThemeIcon();
@@ -324,7 +333,7 @@
         let currentStorageSize = 0;
         let authorsMap = new Map(); // Cache for author names
         let searchTimeout; // For debouncing search
-        
+
         // Configuration
         const CONFIG = {
             masterUrl: './master.sqlite.zip',
@@ -341,25 +350,25 @@
                     locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
                 });
                 sqlWorker = SQL;
-                
+
                 // Load master database
                 await loadMasterDatabase();
-                
+
                 // Load authors
                 await loadAuthors();
-                
+
                 // Load books list
                 await loadBooksList();
-                
+
                 // Setup search
                 setupSearch();
-                
+
                 // Update stats
                 await updateStats();
-                
+
                 hideLoading();
                 showBooksList();
-                
+
             } catch (error) {
                 showError('خطأ في تحميل التطبيق: ' + error.message);
                 hideLoading();
@@ -377,13 +386,13 @@
             async init() {
                 return new Promise((resolve, reject) => {
                     const request = indexedDB.open(this.dbName, this.version);
-                    
+
                     request.onerror = () => reject(request.error);
                     request.onsuccess = () => {
                         this.db = request.result;
                         resolve();
                     };
-                    
+
                     request.onupgradeneeded = (event) => {
                         const db = event.target.result;
                         if (!db.objectStoreNames.contains('books')) {
@@ -398,12 +407,12 @@
 
             async get(storeName, id) {
                 if (!this.db) await this.init();
-                
+
                 return new Promise((resolve, reject) => {
                     const transaction = this.db.transaction([storeName], 'readonly');
                     const store = transaction.objectStore(storeName);
                     const request = store.get(id);
-                    
+
                     request.onerror = () => reject(request.error);
                     request.onsuccess = () => resolve(request.result);
                 });
@@ -411,12 +420,12 @@
 
             async set(storeName, data) {
                 if (!this.db) await this.init();
-                
+
                 return new Promise((resolve, reject) => {
                     const transaction = this.db.transaction([storeName], 'readwrite');
                     const store = transaction.objectStore(storeName);
                     const request = store.put(data);
-                    
+
                     request.onerror = () => reject(request.error);
                     request.onsuccess = () => resolve();
                 });
@@ -434,12 +443,12 @@
 
             async getAllKeys(storeName) {
                 if (!this.db) await this.init();
-                
+
                 return new Promise((resolve, reject) => {
                     const transaction = this.db.transaction([storeName], 'readonly');
                     const store = transaction.objectStore(storeName);
                     const request = store.getAllKeys();
-                    
+
                     request.onerror = () => reject(request.error);
                     request.onsuccess = () => resolve(request.result);
                 });
@@ -447,12 +456,12 @@
 
             async getAll(storeName) {
                 if (!this.db) await this.init();
-                
+
                 return new Promise((resolve, reject) => {
                     const transaction = this.db.transaction([storeName], 'readonly');
                     const store = transaction.objectStore(storeName);
                     const request = store.getAll();
-                    
+
                     request.onerror = () => reject(request.error);
                     request.onsuccess = () => resolve(request.result);
                 });
@@ -460,12 +469,12 @@
 
             async clear(storeName) {
                 if (!this.db) await this.init();
-                
+
                 return new Promise((resolve, reject) => {
                     const transaction = this.db.transaction([storeName], 'readwrite');
                     const store = transaction.objectStore(storeName);
                     const request = store.clear();
-                    
+
                     request.onerror = () => reject(request.error);
                     request.onsuccess = () => resolve();
                 });
@@ -474,7 +483,7 @@
             async calculateStorageSize() {
                 try {
                     let totalSize = 0;
-                    
+
                     // Get all books data
                     const books = await this.getAll('books');
                     books.forEach(book => {
@@ -482,7 +491,7 @@
                             totalSize += book.data.byteLength;
                         }
                     });
-                    
+
                     // Get master database data
                     const master = await this.getAll('master');
                     master.forEach(item => {
@@ -490,7 +499,7 @@
                             totalSize += item.data.byteLength;
                         }
                     });
-                    
+
                     return totalSize;
                 } catch (error) {
                     console.error('Error calculating storage size:', error);
@@ -504,11 +513,11 @@
         // Format bytes to human readable format
         function formatBytes(bytes) {
             if (bytes === 0) return '0 B';
-            
+
             const k = 1024;
             const sizes = ['B', 'KB', 'MB', 'GB'];
             const i = Math.floor(Math.log(bytes) / Math.log(k));
-            
+
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
 
@@ -518,7 +527,7 @@
             if (!response.ok) {
                 throw new Error(`خطأ في التحميل: ${response.status}`);
             }
-            
+
             const contentLength = response.headers.get('content-length');
             const total = parseInt(contentLength, 10);
             let loaded = 0;
@@ -528,12 +537,12 @@
 
             while (true) {
                 const { done, value } = await reader.read();
-                
+
                 if (done) break;
-                
+
                 chunks.push(value);
                 loaded += value.length;
-                
+
                 if (total) {
                     const progress = Math.round((loaded / total) * 100);
                     updateProgress(progress);
@@ -549,9 +558,9 @@
 
             updateProgress(100);
             updateLoadingText('جاري استخراج الملفات...');
-            
+
             const zip = await JSZip.loadAsync(arrayBuffer);
-            
+
             // Find the SQLite file
             let sqliteFile = null;
             for (const [filename, file] of Object.entries(zip.files)) {
@@ -560,11 +569,11 @@
                     break;
                 }
             }
-            
+
             if (!sqliteFile) {
                 throw new Error('لم يتم العثور على ملف قاعدة البيانات في الأرشيف');
             }
-            
+
             const sqliteData = await sqliteFile.async('uint8array');
             return sqliteData;
         }
@@ -581,7 +590,7 @@
         async function loadMasterDatabase() {
             updateLoadingText('جاري تحميل فهرس الكتب الرئيسي...');
             updateProgress(0);
-            
+
             // Check cache first
             const cached = await cacheManager.get('master', 'master.sqlite');
             if (cached) {
@@ -589,27 +598,27 @@
                 masterDb = new sqlWorker.Database(cached.data);
                 return;
             }
-            
+
             // Download and cache
             const sqliteData = await downloadAndExtractZip(CONFIG.masterUrl);
             await cacheManager.set('master', { id: 'master.sqlite', data: sqliteData });
-            
+
             masterDb = new sqlWorker.Database(sqliteData);
         }
 
         // Load authors from the database
         async function loadAuthors() {
             updateLoadingText('جاري تحميل أسماء المؤلفين...');
-            
+
             try {
                 const stmt = masterDb.prepare("SELECT author_id, author_name FROM author");
-                
+
                 while (stmt.step()) {
                     const row = stmt.getAsObject();
                     authorsMap.set(row.author_id, row.author_name);
                 }
                 stmt.free();
-                
+
                 console.log(`تم تحميل ${authorsMap.size} مؤلف`);
             } catch (error) {
                 console.error('خطأ في تحميل المؤلفين:', error);
@@ -626,16 +635,16 @@
         async function loadBooksList() {
             updateLoadingText('جاري تحميل قائمة الكتب...');
             updateProgress('');
-            
+
             const stmt = masterDb.prepare("SELECT * FROM book ORDER BY book_name");
             allBooks = [];
-            
+
             while (stmt.step()) {
                 const row = stmt.getAsObject();
                 allBooks.push(row);
             }
             stmt.free();
-            
+
             filteredBooks = [...allBooks];
             renderBooksList();
         }
@@ -644,43 +653,49 @@
         async function updateStats() {
             // Calculate storage size
             currentStorageSize = await cacheManager.calculateStorageSize();
-            
+
             // Update storage button
-            document.getElementById('storage-size').textContent = formatBytes(currentStorageSize);
+            const element = document.getElementById('storage-size');
+            element.textContent = formatBytes(currentStorageSize);
+            element.style.direction = 'ltr';
+
+
         }
 
         // Clear storage with simple confirm dialog
         async function clearStorageWithConfirm() {
             const confirmed = confirm(`هل تريد مسح جميع البيانات المحفوظة؟\nسيتم حذف ${formatBytes(currentStorageSize)} من البيانات.\nلا يمكن التراجع عن هذا الإجراء!`);
-            
+
             if (confirmed) {
                 try {
                     updateLoadingText('جاري مسح البيانات المحفوظة...');
                     hideBooksList();
                     showLoading();
-                    
+
                     // Clear both stores
                     await cacheManager.clear('books');
                     await cacheManager.clear('master');
-                    
+                    window.location.href = "/";
+                    return;
+
                     // Reset storage size
                     currentStorageSize = 0;
-                    
+
                     // Update stats
                     await updateStats();
-                    
+
                     // Re-render books list to update cached indicators
                     await renderBooksList();
-                    
+
                     hideLoading();
                     showBooksList();
-                    
+
                     // Show success message briefly
                     showError('تم مسح جميع البيانات المحفوظة بنجاح');
                     setTimeout(() => {
                         document.getElementById('error-message').classList.add('hidden');
                     }, 3000);
-                    
+
                 } catch (error) {
                     hideLoading();
                     showError('خطأ في مسح البيانات: ' + error.message);
@@ -692,30 +707,30 @@
         async function renderBooksList() {
             const grid = document.getElementById('books-grid');
             grid.innerHTML = '';
-            
+
             // Show loading indicator if we're checking cache status for many books
             if (filteredBooks.length > 50) {
                 updateLoadingText('جاري تحديث حالة الكتب...');
                 showLoading();
-                
+
                 // Use setTimeout to allow UI to update
                 await new Promise(resolve => setTimeout(resolve, 10));
             }
-            
+
             for (const book of filteredBooks) {
                 // Create book filename using the format: book_id-main_author-minor_online
                 const bookFilename = `${book.book_id}-${book.major_online}-${book.minor_online}`;
-                
+
                 // Always check current cache status (don't rely on cached results)
                 const isCached = await cacheManager.exists('books', bookFilename);
-                
+
                 // Get author name
                 const authorName = getAuthorName(book.main_author);
-                
+
                 const bookCard = document.createElement('div');
                 bookCard.className = 'book-card';
                 bookCard.onclick = () => openBook(book);
-                
+
                 bookCard.innerHTML = `
                     <div class="book-title">${book.book_name || 'كتاب بدون عنوان'}</div>
                     <div class="book-meta">
@@ -723,10 +738,10 @@
                         ${isCached ? '<span class="cached-indicator">محفوظ</span>' : ''}
                     </div>
                 `;
-                
+
                 grid.appendChild(bookCard);
             }
-            
+
             // Hide loading if it was shown
             if (filteredBooks.length > 50) {
                 hideLoading();
@@ -746,7 +761,7 @@
                 minor_online: book.minor_online,
                 config: CONFIG
             }));
-            
+
             // Redirect to reader page
             window.location.href = 'read.html';
         }
@@ -754,7 +769,7 @@
         // Normalize Arabic text for better search
         function normalizeArabicText(text) {
             if (!text) return '';
-            
+
             return text
                 .toLowerCase()
                 // Normalize Arabic letters
@@ -778,31 +793,31 @@
             }
 
             const normalizedQuery = normalizeArabicText(query);
-            
+
             filteredBooks = allBooks.filter(book => {
                 const bookName = normalizeArabicText(book.book_name || '');
                 const authorName = normalizeArabicText(getAuthorName(book.main_author));
-                
+
                 // Check if query matches book name or author name
                 return bookName.includes(normalizedQuery) || authorName.includes(normalizedQuery);
             });
-            
+
             renderBooksList();
         }
 
         // Search functionality with improved debouncing and paste handling
         function setupSearch() {
             const searchInput = document.getElementById('search-input');
-            
+
             // Handle input events (typing)
             searchInput.addEventListener('input', (e) => {
                 const query = e.target.value;
-                
+
                 // Clear previous timeout
                 if (searchTimeout) {
                     clearTimeout(searchTimeout);
                 }
-                
+
                 // Debounce search for performance
                 searchTimeout = setTimeout(() => {
                     performSearch(query);
@@ -815,7 +830,7 @@
                 if (searchTimeout) {
                     clearTimeout(searchTimeout);
                 }
-                
+
                 // Use setTimeout to get the pasted value after it's inserted
                 setTimeout(() => {
                     const query = e.target.value;
@@ -830,7 +845,7 @@
                     if (searchTimeout) {
                         clearTimeout(searchTimeout);
                     }
-                    
+
                     const query = e.target.value;
                     performSearch(query);
                 }
@@ -907,4 +922,5 @@
         });
     </script>
 </body>
+
 </html>
