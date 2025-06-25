@@ -331,21 +331,23 @@ function loadCurrentPage() {
 }
 
 // Navigation functions
-function nextPage() {
+function nextPage(scrollToTop = true) {
     if (currentPage < totalPages) {
         currentPage++;
         updatePageDisplay();
         loadCurrentPage();
-        scrollToTop();
+        if(scrollToTop)
+            scrollToTop();
     }
 }
 
-function previousPage() {
+function previousPage(scrollToTop = true) {
     if (currentPage > 1) {
         currentPage--;
         updatePageDisplay();
         loadCurrentPage();
-        scrollToTop();
+        if(scrollToTop)
+            scrollToTop();
     }
 }
 

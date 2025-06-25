@@ -31,7 +31,7 @@
         </div>
 
         <!-- Page Controls -->
-        <div id="page-controls" class="page-controls hidden">
+        <div id="page-controls" class="page-controls hidden" style="display: none !important;">
             <div class="goto-page">
                 <span>انتقال إلى الصفحة:</span>
                 <input type="number" id="goto-input" class="goto-input" min="1" placeholder="رقم">
@@ -43,23 +43,23 @@
         <div id="book-reader" class="hidden">
             <div class="reader-container">
                 <div class="reader-header">
-                    <button class="theme-toggle" onclick="toggleTheme()" id="theme-toggle">
-                        🌙
-                    </button>
                     <div class="reader-title" id="book-title-header"></div>
                     <div class="header-controls">
-                        <button class="home-btn" onclick="goHome()">🏠 الرئيسية</button>
-                        <button class="back-btn" onclick="goBack()">← العودة</button>
+                        <button class="theme-toggle2" onclick="toggleTheme()" id="theme-toggle">
+                            🌙
+                        </button>
+                        <button class="home-btn" onclick="goHome()">🏠</button>
+                        <button class="back-btn" onclick="goBack()">⬅️</button>
                     </div>
                 </div>
 
                 <!-- Top Navigation -->
                 <div class="navigation navigation-top">
-                    <button class="nav-btn" id="prev-btn-top" onclick="previousPage()">الصفحة السابقة</button>
+                    <button class="nav-btn" id="prev-btn-top" onclick="previousPage(false)">الصفحة السابقة</button>
                     <div class="page-info">
                         <span id="current-page-top">1</span> / <span id="total-pages-top">1</span>
                     </div>
-                    <button class="nav-btn" id="next-btn-top" onclick="nextPage()">الصفحة التالية</button>
+                    <button class="nav-btn" id="next-btn-top" onclick="nextPage(false)">الصفحة التالية</button>
                 </div>
 
                 <div class="page-content" id="page-content"></div>
