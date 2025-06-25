@@ -74,10 +74,15 @@
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
 
-        .theme-toggle {
+        .header-buttons {
             position: absolute;
             top: 0;
             right: 0;
+            display: flex;
+            gap: 10px;
+        }
+
+        .theme-toggle, .storage-button {
             background: var(--bg-secondary);
             border: none;
             color: var(--text-light);
@@ -89,9 +94,13 @@
             backdrop-filter: blur(10px);
         }
 
-        .theme-toggle:hover {
+        .theme-toggle:hover, .storage-button:hover {
             background: rgba(255,255,255,0.2);
             transform: scale(1.05);
+        }
+
+        #storage-size {
+            font-size: 0.8rem;
         }
 
         .loading {
@@ -217,13 +226,30 @@
             margin-bottom: 10px;
         }
 
+        .stats {
+            background: var(--bg-secondary);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+            color: var(--text-light);
+            backdrop-filter: blur(10px);
+        }
+
+        .stats h3 {
+            margin-bottom: 10px;
+        }
+
+
+
         @media (max-width: 768px) {
             .books-grid {
                 grid-template-columns: 1fr;
             }
             
-            .theme-toggle {
+            .header-buttons {
                 position: static;
+                justify-content: center;
                 margin-bottom: 20px;
             }
         }
@@ -232,24 +258,22 @@
 <body>
     <div class="container">
         <div class="header">
-            <button class="theme-toggle" onclick="toggleTheme()" id="theme-toggle">
-                🌙
-            </button>
+            <div class="header-buttons">
+                <button class="theme-toggle" onclick="toggleTheme()" id="theme-toggle">
+                    🌙
+                </button>
+                <button class="storage-button" onclick="clearStorageWithConfirm()" id="storage-button">
+                    🗑️ <span id="storage-size">حساب...</span>
+                </button>
+            </div>
             <h1>📚 مكتبة الكتب الإسلامية</h1>
-            <p>قارئ الكتب الرقمية</p>
+            <p>Islamic Books Library</p>
         </div>
 
         <!-- Loading Screen -->
         <div id="loading" class="loading">
             <div class="spinner"></div>
             <p>جاري تحميل فهرس الكتب...</p>
-        </div>
-
-        <!-- Stats -->
-        <div id="stats" class="stats hidden">
-            <h3>📊 إحصائيات المكتبة</h3>
-            <p>إجمالي الكتب: <span id="total-books">0</span></p>
-            <p>الكتب المحفوظة: <span id="cached-books">0</span></p>
         </div>
 
         <!-- Books List -->
@@ -295,6 +319,7 @@
         let masterDb;
         let allBooks = [];
         let filteredBooks = [];
+        let currentStorageSize = 0;
         
         // Configuration
         const CONFIG = {
@@ -407,9 +432,73 @@
                     request.onsuccess = () => resolve(request.result);
                 });
             }
+
+            async getAll(storeName) {
+                if (!this.db) await this.init();
+                
+                return new Promise((resolve, reject) => {
+                    const transaction = this.db.transaction([storeName], 'readonly');
+                    const store = transaction.objectStore(storeName);
+                    const request = store.getAll();
+                    
+                    request.onerror = () => reject(request.error);
+                    request.onsuccess = () => resolve(request.result);
+                });
+            }
+
+            async clear(storeName) {
+                if (!this.db) await this.init();
+                
+                return new Promise((resolve, reject) => {
+                    const transaction = this.db.transaction([storeName], 'readwrite');
+                    const store = transaction.objectStore(storeName);
+                    const request = store.clear();
+                    
+                    request.onerror = () => reject(request.error);
+                    request.onsuccess = () => resolve();
+                });
+            }
+
+            async calculateStorageSize() {
+                try {
+                    let totalSize = 0;
+                    
+                    // Get all books data
+                    const books = await this.getAll('books');
+                    books.forEach(book => {
+                        if (book.data && book.data.byteLength) {
+                            totalSize += book.data.byteLength;
+                        }
+                    });
+                    
+                    // Get master database data
+                    const master = await this.getAll('master');
+                    master.forEach(item => {
+                        if (item.data && item.data.byteLength) {
+                            totalSize += item.data.byteLength;
+                        }
+                    });
+                    
+                    return totalSize;
+                } catch (error) {
+                    console.error('Error calculating storage size:', error);
+                    return 0;
+                }
+            }
         }
 
         const cacheManager = new CacheManager();
+
+        // Format bytes to human readable format
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 B';
+            
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
 
         // Download and extract zip file
         async function downloadAndExtractZip(url) {
@@ -475,13 +564,50 @@
 
         // Update statistics
         async function updateStats() {
-            const totalBooks = allBooks.length;
-            const cachedKeys = await cacheManager.getAllKeys('books');
-            const cachedBooks = cachedKeys.length;
+            // Calculate storage size
+            currentStorageSize = await cacheManager.calculateStorageSize();
             
-            document.getElementById('total-books').textContent = totalBooks;
-            document.getElementById('cached-books').textContent = cachedBooks;
-            document.getElementById('stats').classList.remove('hidden');
+            // Update storage button
+            document.getElementById('storage-size').textContent = formatBytes(currentStorageSize);
+        }
+
+        // Clear storage with simple confirm dialog
+        async function clearStorageWithConfirm() {
+            const confirmed = confirm(`هل تريد مسح جميع البيانات المحفوظة؟\nسيتم حذف ${formatBytes(currentStorageSize)} من البيانات.\nلا يمكن التراجع عن هذا الإجراء!`);
+            
+            if (confirmed) {
+                try {
+                    updateLoadingText('جاري مسح البيانات المحفوظة...');
+                    hideBooksList();
+                    showLoading();
+                    
+                    // Clear both stores
+                    await cacheManager.clear('books');
+                    await cacheManager.clear('master');
+                    
+                    // Reset storage size
+                    currentStorageSize = 0;
+                    
+                    // Update stats
+                    await updateStats();
+                    
+                    // Re-render books list to update cached indicators
+                    await renderBooksList();
+                    
+                    hideLoading();
+                    showBooksList();
+                    
+                    // Show success message briefly
+                    showError('تم مسح جميع البيانات المحفوظة بنجاح');
+                    setTimeout(() => {
+                        document.getElementById('error-message').classList.add('hidden');
+                    }, 3000);
+                    
+                } catch (error) {
+                    hideLoading();
+                    showError('خطأ في مسح البيانات: ' + error.message);
+                }
+            }
         }
 
         // Render books list
@@ -547,6 +673,14 @@
         // UI helper functions
         function hideLoading() {
             document.getElementById('loading').classList.add('hidden');
+        }
+
+        function showLoading() {
+            document.getElementById('loading').classList.remove('hidden');
+        }
+
+        function hideBooksList() {
+            document.getElementById('books-list').classList.add('hidden');
         }
 
         function showBooksList() {

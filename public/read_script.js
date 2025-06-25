@@ -40,7 +40,8 @@ async function init() {
         // Get book info from localStorage
         const storedBookInfo = localStorage.getItem('currentBook');
         if (!storedBookInfo) {
-            showError('لم يتم العثور على معلومات الكتاب. يرجى العودة إلى القائمة الرئيسية.');
+            window.location.href = "/";
+            //showError('لم يتم العثور على معلومات الكتاب. يرجى العودة إلى القائمة الرئيسية.');
             return;
         }
 
