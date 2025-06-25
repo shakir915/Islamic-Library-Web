@@ -428,3 +428,19 @@ body {
         right: -12px;
     }
 }
+
+
+/* Style for elements with data-type="title" */
+[data-type="title"] {
+    font-weight: bold;
+  
+  
+}
+
+/* Alternative: If you want to target span specifically */
+/* span[data-type="title"] {
+    font-weight: bold;
+    display: block;
+    margin-top: 0.25em;
+    margin-bottom: 0.25em;
+} */

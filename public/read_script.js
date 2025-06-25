@@ -361,10 +361,10 @@ function loadCurrentPage() {
         let content = page.content || 'لا يوجد محتوى لهذه الصفحة';
         
         // Clean HTML tags for better display but preserve some formatting
-        content = content.replace(/<span[^>]*>/g, '').replace(/<\/span>/g, '');
-        content = content.replace(/<[^>]*>/g, '').trim();
+       // content = content.replace(/<span[^>]*>/g, '').replace(/<\/span>/g, '');
+        //content = content.replace(/<[^>]*>/g, '').trim();
         
-        document.getElementById('page-content').textContent = content;
+        document.getElementById('page-content').innerHTML = content;
     } else {
         document.getElementById('page-content').textContent = 'خطأ في تحميل الصفحة';
     }
